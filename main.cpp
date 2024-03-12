@@ -46,10 +46,18 @@ int main() {
 
     std::cout << "Enter the command" << std::endl;
 
-    std::string command;
-    std::getline(std::cin, command);
+    std::string input;
+    std::getline(std::cin, input);
 
-    std::vector<std::string> input = parseInput(command);
+    std::vector<std::string> command = parseInput(input);
+
+    if(command.at(0) == "insert-m") {
+        Studio studio(std::stoul(command.at(1)), command.at(2).c_str());
+        studio.insert(studio_file, 0);
+    }
+    else if (command.at(0) == "insert-s") {
+
+    }
 
     //perform commands actions
 

@@ -2,12 +2,12 @@
 #include "../Studio/Studio.h"
 #include "../Film/Film.h"
 
-bool Studio::insertStudio(const Studio& studio, std::fstream& file, const std::streampos& pos) {
+bool Studio::insert(std::fstream& file, const std::streampos& pos) {
     if (!file)
         return false;
 
     file.seekp(pos);
-    file.write(reinterpret_cast<const char*>(&studio), sizeof(Studio));
+    file.write(reinterpret_cast<const char*>(this), sizeof(Studio));
     file.flush();
 
     return !file.fail();
