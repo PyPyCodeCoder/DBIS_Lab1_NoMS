@@ -12,5 +12,4 @@ private:
 public:
     bool insertFilm(const Film& film, std::fstream& file, const std::streampos& pos);
 };
-
 #endif //LAB1_FILM_H

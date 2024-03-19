@@ -1,65 +1,52 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "Handlers/handlers.h"
+#include "Helpers/helpers.h"
+#include "Studio/Studio.h"
+#include "Film/Film.h"
 
 int main() {
-    //std::cout << "Enter the path for the file with studios:" << std::endl;
+    try {
+        //std::cout << "Enter the path for the file with studios:" << std::endl;
+        std::string studio_filepath = R"(D:\Valera\122_22_2\DB\Lab1_NoMS\Studio\Studio.fl)";
+        //std::cin >> studio_filepath;
+        std::fstream studio_file = getFile(studio_filepath);
 
-    std::string studio_filepath = R"(D:\Valera\122_22_2\DB\Lab1_NoMS\Studio\Studio.fl)";
-    //std::cin >> studio_filepath;
+        //std::cout << "Enter the path for the file with films:" << std::endl;
+        std::string film_filepath = R"(D:\Valera\122_22_2\DB\Lab1_NoMS\Film\Film.fl)";
+        //std::cin >> film_filepath;
+        std::fstream film_file = getFile(film_filepath);
 
-    std::fstream studio_file(studio_filepath, std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);
-    auto err = errno;
+        //в місце використання
+        //std::string ind_filepath = R"(D:\Valera\122_22_2\DB\Lab1_NoMS\Studio\IndexTable\Studio.ind)";
 
-    if (err == ENOENT)
-    {
-        studio_file = std::fstream(studio_filepath, std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);
-    }
+        while(true) {
+            std::cout << "Enter the command" << std::endl;
 
-    if (!studio_file) {
-        std::cerr << "Unable to open file from " << studio_filepath << std::endl;
+            std::string input;
+            std::getline(std::cin, input);
 
-        return -1;
-    }
+            std::vector<std::string> command = parseInput(input);
 
+            //perform commands actions
+            if (command.at(0) == "insert-m") {
+                Studio studio(std::stoul(command.at(1)), command.at(2).c_str());
 
-    //std::cout << "Enter the path for the file with films:" << std::endl;
+                studio.setStudioAddress(studio.createStudioAddress());//position actually
+                studio.setFilmsAddress(0);//where?
+                studio.setStudioFilms(0);
 
-    std::string film_filepath = R"(D:\Valera\122_22_2\DB\Lab1_NoMS\Film\Film.fl)";
-    //std::cin >> film_filepath;
-
-    std::fstream film_file(film_filepath, std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);
-    auto err1 = errno;
-
-    if (err1 == ENOENT)
-    {
-        film_file = std::fstream(film_filepath, std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);
-    }
-
-    if (!film_file) {
-        std::cerr << "Unable to open file from " << film_filepath << std::endl;
-
-        return -1;
-    }
-
-    while(true) {
-        std::cout << "Enter the command" << std::endl;
-
-        std::string input;
-        std::getline(std::cin, input);
-
-        std::vector<std::string> command = parseInput(input);
-
-        //perform commands actions
-        if (command.at(0) == "insert-m") {
-            Studio studio(std::stoul(command.at(1)), command.at(2).c_str());
-            studio.insert(studio_file, 0);
-        } else if (command.at(0) == "insert-s") {
+                studio.insert(studio_file, 0);
+            } else if (command.at(0) == "insert-s") {
 
 
-        } else if (command.at(0) == "exit") {
-            return 0;
+            } else if (command.at(0) == "exit") {
+                return 0;
+            }
         }
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Exception occurred: " << e.what() << std::endl;
+        return -1;
     }
 }
