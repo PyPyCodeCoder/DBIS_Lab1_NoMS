@@ -6,7 +6,7 @@
 int main() {
     //std::cout << "Enter the path for the file with studios:" << std::endl;
 
-    std::string studio_filepath = "D:\\Valera\\122_22_2\\DB\\Lab1_NoMS\\Studio\\Studio.fl";
+    std::string studio_filepath = R"(D:\Valera\122_22_2\DB\Lab1_NoMS\Studio\Studio.fl)";
     //std::cin >> studio_filepath;
 
     std::fstream studio_file(studio_filepath, std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);
@@ -26,7 +26,7 @@ int main() {
 
     //std::cout << "Enter the path for the file with films:" << std::endl;
 
-    std::string film_filepath = "D:\\Valera\\122_22_2\\DB\\Lab1_NoMS\\Film\\Film.fl";
+    std::string film_filepath = R"(D:\Valera\122_22_2\DB\Lab1_NoMS\Film\Film.fl)";
     //std::cin >> film_filepath;
 
     std::fstream film_file(film_filepath, std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);
@@ -43,23 +43,23 @@ int main() {
         return -1;
     }
 
+    while(true) {
+        std::cout << "Enter the command" << std::endl;
 
-    std::cout << "Enter the command" << std::endl;
+        std::string input;
+        std::getline(std::cin, input);
 
-    std::string input;
-    std::getline(std::cin, input);
+        std::vector<std::string> command = parseInput(input);
 
-    std::vector<std::string> command = parseInput(input);
+        //perform commands actions
+        if (command.at(0) == "insert-m") {
+            Studio studio(std::stoul(command.at(1)), command.at(2).c_str());
+            studio.insert(studio_file, 0);
+        } else if (command.at(0) == "insert-s") {
 
-    if(command.at(0) == "insert-m") {
-        Studio studio(std::stoul(command.at(1)), command.at(2).c_str());
-        studio.insert(studio_file, 0);
+
+        } else if (command.at(0) == "exit") {
+            return 0;
+        }
     }
-    else if (command.at(0) == "insert-s") {
-
-    }
-
-    //perform commands actions
-
-    return 0;
 }

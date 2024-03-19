@@ -5,10 +5,19 @@
 
 class Studio {
 private:
-    uint32_t id;
+    //seen by user
+    const uint32_t id;
     char name[50] = {};
+
+    //for internal usage
+    uint32_t studioAddress;//адреса студії (може змінюватись)
+
+    uint32_t filmsAddress; //вказівник на перший фільм
+    uint32_t studioFilms; //кількість фільмів студії
+
+    bool isDeleted = false;
+
 public:
-    Studio() : id(0), name{} {}
     Studio(uint32_t _id, const char* _name) : id(_id) {
         strncpy(name, _name, sizeof(name) - 1);
         name[sizeof(name) - 1] = '\0';

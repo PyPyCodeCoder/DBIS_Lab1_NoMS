@@ -12,3 +12,21 @@ std::vector<std::string> parseInput(std::string input) {
     }
     return command;
 }
+
+bool createStudioIndexFile() {
+    std::string ind_filepath = R"(D:\Valera\122_22_2\DB\Lab1_NoMS\Studio\Studio.ind)";
+
+    std::fstream ind_file(ind_filepath, std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);
+    auto err = errno;
+
+    if (err == ENOENT)
+    {
+        ind_file = std::fstream(ind_filepath, std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);
+    }
+
+    if (!ind_file) {
+        std::cerr << "Unable to open file from " << ind_filepath << std::endl;
+
+        return -1;
+    }
+}
