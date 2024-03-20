@@ -2,6 +2,10 @@
 #define LAB1_STUDIO_H
 #include <cstdint>
 #include <cstring>
+#include <fstream>
+#include "../Helpers/helpers.h"
+#include "../Film/Film.h"
+#include "../Studio/IndexTable/Index.h"
 
 class Studio {
 private:
@@ -23,7 +27,7 @@ public:
         name[sizeof(name) - 1] = '\0';
     }
 
-    bool insert(std::fstream& file, const std::streampos& pos);
+    bool insert(const std::streampos& pos);
 
     uint32_t getStudioAddress();
     uint32_t getFilmsAddress();

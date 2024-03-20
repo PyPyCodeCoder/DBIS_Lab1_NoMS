@@ -1,20 +1,17 @@
-#include <fstream>
 #include "../Studio/Studio.h"
-#include "../Film/Film.h"
-#include "../Studio/IndexTable/Index.h"
 
-bool Studio::insert(std::fstream& file, const std::streampos& pos) {
-    if (!file)
+bool Studio::insert(const std::streampos& pos) {
+    if (!STUDIO_FILE)
         return false;
 
-    file.seekp(pos);
-    file.write(reinterpret_cast<const char*>(this), sizeof(Studio));
-    file.flush();
+    STUDIO_FILE.seekp(pos);
+    STUDIO_FILE.write(reinterpret_cast<const char*>(this), sizeof(Studio));
+    STUDIO_FILE.flush();
 
     Index index(this->id, this->studioAddress);
     index.insertRecord();
 
-    return !file.fail();
+    return !STUDIO_FILE.fail();
 }
 
 uint32_t Studio::getStudioAddress() {

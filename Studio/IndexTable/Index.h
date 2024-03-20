@@ -5,7 +5,9 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
-//get file and positions?
+#include "../../Helpers/helpers.h"
+
+//get positions
 class Index {
 private:
     std::pair<uint32_t, uint32_t> record;
@@ -13,10 +15,10 @@ private:
 public:
     Index(uint32_t id, uint32_t address) : record(id, address) {}
 
-    bool insertRecord(std::fstream& file, const std::streampos& pos);
-    bool deleteRecord(std::fstream& file);
-    std::pair<uint32_t, uint32_t> getRecordAt(std::fstream& file, uint32_t index);
-    void sortRecords(std::fstream& file);
+    bool insertRecord(const std::streampos& pos);
+    bool deleteRecord();
+    std::pair<uint32_t, uint32_t> getRecordAt(uint32_t index);
+    void sortRecords();
 };
 
 #endif //LAB1_NOMS_INDEX_H

@@ -5,10 +5,10 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(Lab1_NoMS main.cpp
         Studio/Studio.h
-        Film/Film.h
-        Helpers/helpers.h
-        Studio/IndexTable/Index.cpp
-        Studio/IndexTable/Index.h
         Studio/Studio.cpp
+        Film/Film.h
         Film/Film.cpp
-        Helpers/helpers.cpp)
+        Helpers/helpers.h
+        Helpers/helpers.cpp
+        Studio/IndexTable/Index.h
+        Studio/IndexTable/Index.cpp)

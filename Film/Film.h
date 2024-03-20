@@ -1,6 +1,10 @@
 #ifndef LAB1_FILM_H
 #define LAB1_FILM_H
 #include <cstdint>
+#include <fstream>
+#include "../Helpers/helpers.h"
+#include "../Studio/Studio.h"
+#include "../Studio/IndexTable/Index.h"
 
 class Film {
 private:
@@ -10,6 +14,6 @@ private:
     uint32_t budget;
 
 public:
-    bool insertFilm(const Film& film, std::fstream& file, const std::streampos& pos);
+    bool insertFilm(const Film& film, const std::streampos& pos);
 };
 #endif //LAB1_FILM_H

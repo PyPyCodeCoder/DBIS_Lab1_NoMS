@@ -10,15 +10,14 @@ int main() {
         //std::cout << "Enter the path for the file with studios:" << std::endl;
         std::string studio_filepath = R"(D:\Valera\122_22_2\DB\Lab1_NoMS\Studio\Studio.fl)";
         //std::cin >> studio_filepath;
-        std::fstream studio_file = getFile(studio_filepath);
+        STUDIO_FILE = getFile(studio_filepath);
+
+        IND_FILE = getFile(R"(D:\Valera\122_22_2\DB\Lab1_NoMS\Studio\IndexTable\Studio.ind)");
 
         //std::cout << "Enter the path for the file with films:" << std::endl;
         std::string film_filepath = R"(D:\Valera\122_22_2\DB\Lab1_NoMS\Film\Film.fl)";
         //std::cin >> film_filepath;
-        std::fstream film_file = getFile(film_filepath);
-
-        //в місце використання
-        //std::string ind_filepath = R"(D:\Valera\122_22_2\DB\Lab1_NoMS\Studio\IndexTable\Studio.ind)";
+        FILM_FILE = getFile(film_filepath);
 
         while(true) {
             std::cout << "Enter the command" << std::endl;
