@@ -3,18 +3,20 @@
 #include <cstdint>
 #include <utility>
 #include <fstream>
-
+#include <vector>
+#include <algorithm>
+//get file and positions?
 class Index {
 private:
-    uint32_t id;
-    uint32_t studioAddress;
+    std::pair<uint32_t, uint32_t> record;
+
 public:
-    Index(uint32_t _id, uint32_t _studioAddress) : id(_id), studioAddress(_studioAddress) {}
+    Index(uint32_t id, uint32_t address) : record(id, address) {}
 
-    //write, delete, get
-
-    //get file and positions?
     bool insertRecord(std::fstream& file, const std::streampos& pos);
-    bool deleteRecord(std::fstream& file, const std::streampos& pos);
+    bool deleteRecord(std::fstream& file);
+    std::pair<uint32_t, uint32_t> getRecordAt(std::fstream& file, uint32_t index);
+    void sortRecords(std::fstream& file);
 };
+
 #endif //LAB1_NOMS_INDEX_H
