@@ -1,5 +1,4 @@
 #include <iostream>
-#include <fstream>
 #include <vector>
 #include "Helpers/helpers.h"
 #include "Studio/Studio.h"
@@ -35,7 +34,7 @@ int main() {
                 studio.setFilmsAddress(0);//where?
                 studio.setStudioFilms(0);
 
-                studio.insert(studio_file, 0);
+                studio.insert(0);
             } else if (command.at(0) == "insert-s") {
 
 

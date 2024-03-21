@@ -7,15 +7,17 @@
 #include <algorithm>
 #include "../../Helpers/helpers.h"
 
-//get positions
 class Index {
 private:
     std::pair<uint32_t, uint32_t> record;
+    uint32_t RecordAddress = 0;
 
+    static std::vector<uint32_t> deletedAddresses;
 public:
-    Index(uint32_t id, uint32_t address) : record(id, address) {}
+    Index(uint32_t StudioId, uint32_t StudioAddress) : record(StudioId, StudioAddress) {}
 
-    bool insertRecord(const std::streampos& pos);
+    uint32_t getRecordAddress();
+    bool insertRecord();
     bool deleteRecord();
     std::pair<uint32_t, uint32_t> getRecordAt(uint32_t index);
     void sortRecords();

@@ -1,6 +1,8 @@
-#include <iostream>
-#include <vector>
-#include <fstream>
+#include "../Helpers/helpers.h"
+
+std::fstream STUDIO_FILE;
+std::fstream IND_FILE;
+std::fstream FILM_FILE;
 
 std::fstream getFile(const std::string& filepath) {
     std::fstream file(filepath, std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);
