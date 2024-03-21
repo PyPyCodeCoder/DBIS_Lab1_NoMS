@@ -10,8 +10,8 @@
 class Index {
 private:
     std::pair<uint32_t, uint32_t> record;
-    uint32_t RecordAddress = 0;
 
+    uint32_t RecordAddress;
     static std::vector<uint32_t> deletedAddresses;
 public:
     Index(uint32_t StudioId, uint32_t StudioAddress) : record(StudioId, StudioAddress) {}
@@ -19,8 +19,8 @@ public:
     uint32_t getRecordAddress();
     bool insertRecord();
     bool deleteRecord();
-    std::pair<uint32_t, uint32_t> getRecordAt(uint32_t index);
     void sortRecords();
+    std::pair<uint32_t, uint32_t> getRecordAt(uint32_t index);//не треба
 };
 
 #endif //LAB1_NOMS_INDEX_H

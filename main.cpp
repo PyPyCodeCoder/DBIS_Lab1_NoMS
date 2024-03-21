@@ -30,11 +30,7 @@ int main() {
             if (command.at(0) == "insert-m") {
                 Studio studio(std::stoul(command.at(1)), command.at(2).c_str());
 
-                studio.setStudioAddress(studio.createStudioAddress());//position actually
-                studio.setFilmsAddress(0);//where?
-                studio.setStudioFilms(0);
-
-                studio.insert(0);
+                studio.insert();
             } else if (command.at(0) == "insert-s") {
 
 

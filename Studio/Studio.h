@@ -15,6 +15,7 @@ private:
 
     //for internal usage
     uint32_t studioAddress;//адреса студії (може змінюватись)
+    static std::vector<uint32_t> deletedAddresses;
 
     uint32_t filmsAddress; //вказівник на перший фільм
     uint32_t studioFilms; //кількість фільмів студії
@@ -27,16 +28,8 @@ public:
         name[sizeof(name) - 1] = '\0';
     }
 
-    bool insert(const std::streampos& pos);
+    bool insert();
 
     uint32_t getStudioAddress();
-    uint32_t getFilmsAddress();
-    uint32_t getStudioFilms();
-
-    void setStudioAddress(uint32_t address);
-    void setFilmsAddress(uint32_t address);
-    void setStudioFilms(uint32_t count);
-
-    uint32_t createStudioAddress();
 };
 #endif //LAB1_STUDIO_H

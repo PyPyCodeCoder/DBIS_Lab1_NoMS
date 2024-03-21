@@ -1,10 +1,14 @@
 #include "../Studio/Studio.h"
 
-bool Studio::insert(const std::streampos& pos) {
+std::vector<uint32_t> Studio::deletedAddresses;
+
+bool Studio::insert() {
     if (!STUDIO_FILE)
         return false;
 
-    STUDIO_FILE.seekp(pos);
+    studioAddress = getStudioAddress();
+
+    STUDIO_FILE.seekp(sizeof(Studio) * studioAddress);
     STUDIO_FILE.write(reinterpret_cast<const char*>(this), sizeof(Studio));
     STUDIO_FILE.flush();
 
@@ -15,29 +19,11 @@ bool Studio::insert(const std::streampos& pos) {
 }
 
 uint32_t Studio::getStudioAddress() {
-    return this->studioAddress;
-}
-
-uint32_t Studio::getFilmsAddress() {
-    return this->filmsAddress;
-}
-
-uint32_t Studio::getStudioFilms() {
-    return this->studioFilms;
-}
-
-void Studio::setStudioAddress(uint32_t address) {
-    studioAddress = address;
-}
-
-void Studio::setFilmsAddress(uint32_t address) {
-    filmsAddress = address;
-}
-
-void Studio::setStudioFilms(uint32_t count) {
-    studioFilms = count;
-}
-
-uint32_t Studio::createStudioAddress() {
-    //some logic here
+    if (deletedAddresses.empty()) {
+        return studioAddress + 1; // If no deleted studios, increment the last address
+    } else {
+        uint32_t address = deletedAddresses.back(); // Get the last deleted address
+        deletedAddresses.pop_back(); // Remove it from the list
+        return address;
+    }
 }
