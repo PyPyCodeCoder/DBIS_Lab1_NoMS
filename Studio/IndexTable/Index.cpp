@@ -4,7 +4,8 @@ std::vector<uint32_t> Index::deletedAddresses;
 
 uint32_t Index::getRecordAddress() {
     if (deletedAddresses.empty()) {
-        return RecordAddress + 1; // If no deleted records, increment the last address
+        uint32_t fileSize = IND_FILE.tellg();
+        return fileSize / (sizeof(record));
     } else {
         uint32_t address = deletedAddresses.back(); // Get the last deleted address
         deletedAddresses.pop_back(); // Remove it from the list

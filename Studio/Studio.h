@@ -29,7 +29,6 @@ public:
     }
 
     bool insert();
-
     uint32_t getStudioAddress();
 };
 #endif //LAB1_STUDIO_H

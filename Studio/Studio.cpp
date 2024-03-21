@@ -20,9 +20,10 @@ bool Studio::insert() {
 
 uint32_t Studio::getStudioAddress() {
     if (deletedAddresses.empty()) {
-        return studioAddress + 1; // If no deleted studios, increment the last address
+        uint32_t fileSize = STUDIO_FILE.tellg();
+        return fileSize / (sizeof(Studio));
     } else {
-        uint32_t address = deletedAddresses.back(); // Get the last deleted address
+        uint32_t address = deletedAddresses.back();
         deletedAddresses.pop_back(); // Remove it from the list
         return address;
     }
