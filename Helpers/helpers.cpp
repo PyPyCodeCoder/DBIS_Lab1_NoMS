@@ -52,22 +52,34 @@ void getMaster(uint32_t studioID, std::string clarifier) {
     }
 }
 
-void getSlave(uint32_t id, uint32_t studioId, std::string clarifier) {
-    // Find the film
-    Film film = getFilm(id, studioId);
-//    if (film.getStudioId() == 0) {
-//        // Film not found
-//        std::cout << "Film with ID " << studioId << " not found." << std::endl;
-//        return;
-//    }
+void getSlave(uint32_t filmId, uint32_t studioId, std::string clarifier) {
+    Studio studio = getStudio(studioId);
 
-    // Check if the film belongs to the given studio
-//    if (film.getStudioId() != studioId) {
-//        std::cout << "Film with ID " << studioId << " does not belong to Studio " << studioId << "." << std::endl;
-//        return;
-//    }
+    if (studio.getStudioId() == 0) {
+        std::cout << "Studio with ID " << studioId << " not found." << std::endl;
+        return;
+    }
 
-    // Print the requested information based on the clarifier
+    int64_t firstStudiosFilmAddress = studio.getFirstStudiosFilmAddress();
+
+    Film film;
+    bool found = false;
+    FILM_FILE.seekg(firstStudiosFilmAddress * sizeof(Film));
+    while (FILM_FILE.read(reinterpret_cast<char*>(&film), sizeof(Film))) {
+        if (film.getFilmId() == filmId) {
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        std::cout << "Film with ID " << filmId << " not found for Studio " << studioId << "." << std::endl;
+        return;
+    }
+
+    FILM_FILE.seekg(firstStudiosFilmAddress * sizeof(Film));
+    //FILM_FILE.read(reinterpret_cast<char*>(&film), sizeof(Film));
+
     if (clarifier == "full") {
         std::cout << "Name: " << film.getFilmName() << std::endl;
         std::cout << "Studio ID: " << film.getStudioId() << std::endl;

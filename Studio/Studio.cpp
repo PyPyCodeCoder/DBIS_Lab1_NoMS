@@ -16,8 +16,11 @@ const char* Studio::getStudioName() {
 }
 
 int64_t Studio::getFirstStudiosFilmAddress() {
-    //we need to do here something
+    return firstStudiosFilmAddress;
+}
 
+void Studio::setFirstStudiosFilmAddress(int64_t newAddress) {
+    firstStudiosFilmAddress = newAddress;
 }
 
 int64_t Studio::getStudioAddress() {
@@ -64,6 +67,24 @@ bool Studio::updateStudioName(uint32_t studioId, const char* newName) {
     STUDIO_FILE.seekp(sizeof(Studio) * studioAddress + nameOffset);
 
     STUDIO_FILE.write(newName, sizeof(studio.studioName));
+    STUDIO_FILE.flush();
+
+    return !STUDIO_FILE.fail();
+}
+
+bool Studio::updateStudiosFilmAddress(uint32_t studioId, int64_t newAddress) {
+    Studio studio = getStudio(studioId);
+    if (studio.getStudioId() == 0) {
+        return false;
+    }
+
+    uint32_t studioAddress = studio.getStudioAddress();
+
+    size_t addressOffset = offsetof(Studio, firstStudiosFilmAddress);
+
+    STUDIO_FILE.seekp(sizeof(Studio) * studioAddress + addressOffset);
+
+    STUDIO_FILE.write(reinterpret_cast<const char*>(&newAddress), sizeof(newAddress));
     STUDIO_FILE.flush();
 
     return !STUDIO_FILE.fail();

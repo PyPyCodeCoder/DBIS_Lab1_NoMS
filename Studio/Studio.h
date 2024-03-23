@@ -31,10 +31,11 @@ public:
 
     uint32_t getStudioId();
 
-    void setStudioName(const char* newName);
     const char* getStudioName();
+    void setStudioName(const char* newName);
 
     int64_t getFirstStudiosFilmAddress();
+    void setFirstStudiosFilmAddress(int64_t newAddress);
 
     int64_t getStudioAddress();
 
@@ -42,6 +43,7 @@ public:
 
     bool insert();
     bool updateStudioName(uint32_t studioId, const char* newName);
+    bool updateStudiosFilmAddress(uint32_t studioId, int64_t newAddress);
 };
 
 Studio getStudio(uint32_t studioId);

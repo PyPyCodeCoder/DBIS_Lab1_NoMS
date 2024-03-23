@@ -43,9 +43,7 @@ bool Film::insert() {
         return false;
     }
 
-    int64_t firstStudiosFilmAddress;
-    STUDIO_FILE.seekg(sizeof(Studio) * studioAddress);
-    STUDIO_FILE.read(reinterpret_cast<char*>(&firstStudiosFilmAddress), sizeof(firstStudiosFilmAddress));
+    int64_t firstStudiosFilmAddress = studio.getFirstStudiosFilmAddress();
 
     FILM_FILE.seekp(0, std::ios::end);
     uint32_t filmAddress = FILM_FILE.tellp() / sizeof(Film);
@@ -54,7 +52,7 @@ bool Film::insert() {
 
     // Update the films address in the studio record
     if (firstStudiosFilmAddress == -1) {
-        firstStudiosFilmAddress = filmAddress;
+        studio.updateStudiosFilmAddress(studioId, filmAddress);
     } else {
         Film prevFilm;
         FILM_FILE.seekg(firstStudiosFilmAddress * sizeof(Film));
@@ -68,10 +66,6 @@ bool Film::insert() {
             firstStudiosFilmAddress = prevFilm.getNext();
         }
     }
-
-    STUDIO_FILE.seekp(sizeof(Studio) * studioAddress);
-    STUDIO_FILE.write(reinterpret_cast<const char*>(&firstStudiosFilmAddress), sizeof(firstStudiosFilmAddress));
-    STUDIO_FILE.flush();
 
     return !FILM_FILE.fail() && !STUDIO_FILE.fail();
 }
