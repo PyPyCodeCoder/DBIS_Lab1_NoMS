@@ -2,6 +2,10 @@
 
 std::vector<uint32_t> Studio::deletedAddresses;
 
+const char* Studio::getName() {
+    return name;
+}
+
 bool Studio::insert() {
     if (!STUDIO_FILE)
         return false;
@@ -27,4 +31,28 @@ uint32_t Studio::getStudioAddress() {
         deletedAddresses.pop_back(); // Remove it from the list
         return address;
     }
+}
+
+Studio getStudio(uint32_t studioID) {
+    // Find the record in the Index file
+    IND_FILE.seekg(0, std::ios::beg);
+    std::pair<uint32_t, uint32_t> recordPair;
+    bool found = false;
+    while (IND_FILE.read(reinterpret_cast<char*>(&recordPair), sizeof(recordPair))) {
+        if (recordPair.first == studioID) {
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        std::cout << "Studio with ID " << studioID << " not found in the Index file." << std::endl;
+        return Studio(); // Return an empty Studio object
+    }
+
+    // Retrieve the corresponding Studio record from the Studio.fl file
+    STUDIO_FILE.seekg(recordPair.second * sizeof(Studio));
+    Studio studio;
+    STUDIO_FILE.read(reinterpret_cast<char*>(&studio), sizeof(Studio));
+    return studio;
 }

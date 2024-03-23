@@ -32,3 +32,30 @@ std::vector<std::string> parseInput(std::string input) {
     }
     return command;
 }
+
+
+
+void getMaster(uint32_t studioID, std::string clarifier) {
+    Studio studio = getStudio(studioID);
+
+    if (studio.getId() == 0) {
+        // Studio not found
+        return;
+    }
+
+    if (clarifier == "full") {
+        // Display all fields of the Studio record
+        std::cout << "Studio ID: " << studio.getId() << std::endl;
+        std::cout << "Studio Name: " << studio.getName() << std::endl;
+        std::cout << "Studio Address: " << studio.getStudioAddress() << std::endl;
+        std::cout << "Films Address: " << studio.getFilmsAddress() << std::endl;
+        std::cout << "Number of Films: " << studio.getStudioFilms() << std::endl;
+        std::cout << "Is Deleted: " << (studio.getIsDeleted() ? "Yes" : "No") << std::endl;
+    } else if (clarifier == "name") {
+        // Display only the Studio name
+        std::cout << "Studio Name: " << studio.getName() << std::endl;
+    } else {
+        std::cout << "Invalid clarifier. Please use 'full' or 'name'." << std::endl;
+    }
+}
+

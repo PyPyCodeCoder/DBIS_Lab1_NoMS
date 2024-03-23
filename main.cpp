@@ -29,11 +29,12 @@ int main() {
             //perform commands actions
             if (command.at(0) == "insert-m") {
                 Studio studio(std::stoul(command.at(1)), command.at(2).c_str());
-
                 studio.insert();
             } else if (command.at(0) == "insert-s") {
-
-
+                Film film(std::stoul(command.at(1)), std::stoul(command.at(2)), command.at(3).c_str(), std::stoul(command.at(4)));
+                film.insert();
+            } else if (command.at(0) == "get-m") {
+                getMaster(std::stoul(command.at(1)), command.at(2));
             } else if (command.at(0) == "exit") {
                 return 0;
             }
