@@ -33,29 +33,80 @@ std::vector<std::string> parseInput(std::string input) {
     return command;
 }
 
-
-
 void getMaster(uint32_t studioID, std::string clarifier) {
     Studio studio = getStudio(studioID);
 
-    if (studio.getId() == 0) {
-        // Studio not found
+    if (studio.getStudioId() == 0) {
         return;
     }
 
     if (clarifier == "full") {
-        // Display all fields of the Studio record
-        std::cout << "Studio ID: " << studio.getId() << std::endl;
-        std::cout << "Studio Name: " << studio.getName() << std::endl;
-        std::cout << "Studio Address: " << studio.getStudioAddress() << std::endl;
-        std::cout << "Films Address: " << studio.getFilmsAddress() << std::endl;
-        std::cout << "Number of Films: " << studio.getStudioFilms() << std::endl;
-        std::cout << "Is Deleted: " << (studio.getIsDeleted() ? "Yes" : "No") << std::endl;
-    } else if (clarifier == "name") {
-        // Display only the Studio name
-        std::cout << "Studio Name: " << studio.getName() << std::endl;
+        std::cout << "Studio ID: " << studio.getStudioId() << std::endl;
+        std::cout << "Studio Name: " << studio.getStudioName() << std::endl;
+        std::cout << "Studio Address: " << studio.getNextStudioAddress() << std::endl;
+        std::cout << "Films Address: " << studio.getFirstStudiosFilmAddress() << std::endl;
+    } else if (clarifier == "studioName") {
+        std::cout << "Studio Name: " << studio.getStudioName() << std::endl;
     } else {
-        std::cout << "Invalid clarifier. Please use 'full' or 'name'." << std::endl;
+        std::cout << "Invalid clarifier. Please use 'full' or 'studioName'." << std::endl;
     }
 }
 
+void getSlave(uint32_t id, uint32_t studioId, std::string clarifier) {
+    // Find the film
+    Film film = getFilm(id, studioId);
+//    if (film.getStudioId() == 0) {
+//        // Film not found
+//        std::cout << "Film with ID " << studioId << " not found." << std::endl;
+//        return;
+//    }
+
+    // Check if the film belongs to the given studio
+//    if (film.getStudioId() != studioId) {
+//        std::cout << "Film with ID " << studioId << " does not belong to Studio " << studioId << "." << std::endl;
+//        return;
+//    }
+
+    // Print the requested information based on the clarifier
+    if (clarifier == "full") {
+        std::cout << "Name: " << film.getFilmName() << std::endl;
+        std::cout << "Studio ID: " << film.getStudioId() << std::endl;
+        std::cout << "Budget: " << film.getBudget() << std::endl;
+    } else if (clarifier == "studioName") {
+        std::cout << "Name: " << film.getFilmName() << std::endl;
+    } else if (clarifier == "studioId") {
+        std::cout << "Studio ID: " << film.getStudioId() << std::endl;
+    } else if (clarifier == "budget") {
+        std::cout << "Budget: " << film.getBudget() << std::endl;
+    } else {
+        std::cout << "Invalid clarifier: " << clarifier << std::endl;
+    }
+}
+
+//bool updateStudio(uint32_t studioId, const char* newName) {
+//    // Find the studio record
+//    Studio studio = getStudio(studioId);
+//    if (studio.getStudioId() == 0) {
+//        // Studio not found
+//        return false;
+//    }
+//
+//    // Update the studio studioName
+//    studio.setStudioName(newName);
+//
+//    // Update the studio record in the file
+//    uint32_t studioAddress = studio.getNextStudioAddress();
+//    STUDIO_FILE.seekp(sizeof(Studio) * studioAddress);
+//    STUDIO_FILE.write(reinterpret_cast<const char*>(&studio), sizeof(Studio));
+//    STUDIO_FILE.flush();
+//
+//    return !STUDIO_FILE.fail();
+//}
+
+bool delFilm(uint32_t id, uint32_t studioId) {//тяжко
+    Film film = getFilm(id, studioId);
+
+    uint32_t next = film.getNext();
+
+    return 0;
+}

@@ -1,40 +1,75 @@
 #include "../Studio/Studio.h"
 
-std::vector<uint32_t> Studio::deletedAddresses;
+std::vector<int64_t> Studio::deletedStudiosAddresses;
 
-const char* Studio::getName() {
-    return name;
+uint32_t Studio::getStudioId() {
+    return studioId;
+}
+
+void Studio::setStudioName(const char* newName) {
+    strncpy(studioName, newName, sizeof(studioName) - 1);
+    studioName[sizeof(studioName) - 1] = '\0'; // Ensure null-termination
+}
+
+const char* Studio::getStudioName() {
+    return studioName;
+}
+
+int64_t Studio::getFirstStudiosFilmAddress() {
+    //we need to do here something
+
+}
+
+int64_t Studio::getStudioAddress() {
+    return studioAddress;
+}
+
+int64_t Studio::getNextStudioAddress() {
+    if (deletedStudiosAddresses.empty()) {
+        uint32_t fileSize = STUDIO_FILE.tellg();
+        return fileSize / (sizeof(Studio));
+    } else {
+        uint32_t address = deletedStudiosAddresses.back();
+        deletedStudiosAddresses.pop_back();
+        return address;
+    }
 }
 
 bool Studio::insert() {
     if (!STUDIO_FILE)
         return false;
 
-    studioAddress = getStudioAddress();
+    studioAddress = getNextStudioAddress();
 
     STUDIO_FILE.seekp(sizeof(Studio) * studioAddress);
     STUDIO_FILE.write(reinterpret_cast<const char*>(this), sizeof(Studio));
     STUDIO_FILE.flush();
 
-    Index index(this->id, this->studioAddress);
+    Index index(this->studioId, this->studioAddress);
     index.insertRecord();
 
     return !STUDIO_FILE.fail();
 }
 
-uint32_t Studio::getStudioAddress() {
-    if (deletedAddresses.empty()) {
-        uint32_t fileSize = STUDIO_FILE.tellg();
-        return fileSize / (sizeof(Studio));
-    } else {
-        uint32_t address = deletedAddresses.back();
-        deletedAddresses.pop_back(); // Remove it from the list
-        return address;
+bool Studio::updateStudioName(uint32_t studioId, const char* newName) {
+    Studio studio = getStudio(studioId);
+    if (studio.getStudioId() == 0) {
+        return false;
     }
+
+    uint32_t studioAddress = studio.getStudioAddress();
+
+    size_t nameOffset = offsetof(Studio, studioName);
+
+    STUDIO_FILE.seekp(sizeof(Studio) * studioAddress + nameOffset);
+
+    STUDIO_FILE.write(newName, sizeof(studio.studioName));
+    STUDIO_FILE.flush();
+
+    return !STUDIO_FILE.fail();
 }
 
 Studio getStudio(uint32_t studioID) {
-    // Find the record in the Index file
     IND_FILE.seekg(0, std::ios::beg);
     std::pair<uint32_t, uint32_t> recordPair;
     bool found = false;
@@ -50,7 +85,6 @@ Studio getStudio(uint32_t studioID) {
         return Studio(); // Return an empty Studio object
     }
 
-    // Retrieve the corresponding Studio record from the Studio.fl file
     STUDIO_FILE.seekg(recordPair.second * sizeof(Studio));
     Studio studio;
     STUDIO_FILE.read(reinterpret_cast<char*>(&studio), sizeof(Studio));
