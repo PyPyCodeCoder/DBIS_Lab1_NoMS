@@ -47,4 +47,5 @@ public:
 };
 
 Studio getStudio(uint32_t studioId);
+
 #endif //LAB1_STUDIO_H

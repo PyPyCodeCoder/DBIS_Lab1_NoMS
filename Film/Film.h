@@ -40,4 +40,5 @@ public:
 };
 
 Film getFilm(uint32_t filmId, uint32_t studioId);
+
 #endif //LAB1_FILM_H

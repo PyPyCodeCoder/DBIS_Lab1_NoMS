@@ -50,7 +50,6 @@ bool Film::insert() {
     FILM_FILE.write(reinterpret_cast<const char*>(this), sizeof(Film));
     FILM_FILE.flush();
 
-    // Update the films address in the studio record
     if (firstStudiosFilmAddress == -1) {
         studio.updateStudiosFilmAddress(studioId, filmAddress);
     } else {
@@ -59,7 +58,7 @@ bool Film::insert() {
         while (FILM_FILE.read(reinterpret_cast<char*>(&prevFilm), sizeof(Film))) {
             if (prevFilm.getNext() == -1) {
                 prevFilm.setNext(filmAddress);
-                FILM_FILE.seekp(prevFilm.getNext() * sizeof(Film));
+                FILM_FILE.seekp(firstStudiosFilmAddress * sizeof(Film));
                 FILM_FILE.write(reinterpret_cast<const char*>(&prevFilm), sizeof(Film));
                 break;
             }
@@ -71,20 +70,31 @@ bool Film::insert() {
 }
 
 Film getFilm(uint32_t filmId, uint32_t studioId) {
+    // Get the master record from the master file
     Studio studio = getStudio(studioId);
+
+    // Check if the studio exists
     if (studio.getStudioId() == 0) {
-        return Film();
+        return Film(); // Return an empty Film object if the studio doesn't exist
     }
 
+    // Get the address of the first film in the studio's list of films
     int64_t firstStudiosFilmAddress = studio.getFirstStudiosFilmAddress();
 
+    // Search for the specific film in the list of films
     Film film;
-    FILM_FILE.seekg(firstStudiosFilmAddress * sizeof(Film));
+    FILM_FILE.seekg(firstStudiosFilmAddress * sizeof(Film)); // Move to the beginning of the films list
     while (FILM_FILE.read(reinterpret_cast<char*>(&film), sizeof(Film))) {
-        if (film.getFilmId() == filmId) {
-            return film;
+        if (film.getFilmId() == filmId) { // Check if the film ID matches
+            return film; // Return the found film
+        }
+        // Move to the next film using the next pointer
+        if (film.getNext() != -1) {
+            FILM_FILE.seekg(film.getNext() * sizeof(Film));
+        } else {
+            break; // If next pointer is -1, it means we've reached the end of the list
         }
     }
 
-    return Film();
+    return Film(); // Return an empty Film object if the film is not found
 }
