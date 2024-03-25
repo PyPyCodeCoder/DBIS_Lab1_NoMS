@@ -1,6 +1,97 @@
 #include "../Studio/Studio.h"
 
-std::vector<int64_t> Studio::deletedStudiosAddresses;
+//std::vector<int64_t> Studio::deletedStudiosAddresses;
+std::vector<uint32_t> Studio::deletedStudiosAddresses;
+
+bool Studio::deleteStudio() {
+    if (!STUDIO_FILE || !FILM_FILE)
+        return false;
+
+    ////
+    // Delete all films associated with this studio
+    int64_t firstStudiosFilmAddress = getFirstStudiosFilmAddress();
+    int64_t currentFilmAddress = firstStudiosFilmAddress;
+
+    while (currentFilmAddress != -1) {
+        Film film;
+        FILM_FILE.seekg(currentFilmAddress * sizeof(Film));
+        FILM_FILE.read(reinterpret_cast<char*>(&film), sizeof(Film));
+
+        // Delete the film
+        delFilm(film.getFilmId(), studioId);
+
+        // Move to the next film
+        currentFilmAddress = film.getNext();
+    }
+
+    ////
+    // Find the studio's address
+    STUDIO_FILE.seekg(0, std::ios::beg);
+    Studio studio;
+    int64_t studioAddress = -1;
+    while (STUDIO_FILE.read(reinterpret_cast<char*>(&studio), sizeof(Studio))) {
+        if (studio.getStudioId() == studioId) {
+            studioAddress = STUDIO_FILE.tellg() - static_cast<std::streamoff>(sizeof(Studio));
+            break;
+        }
+    }
+
+    if (studioAddress == -1) {
+        // Studio not found
+        return false;
+    }
+
+    // Mark the studio as deleted
+    deletedStudiosAddresses.push_back(studioAddress / sizeof(Studio));
+
+    // Move to the studio's address and overwrite it with zeros
+    STUDIO_FILE.seekp(studioAddress);
+    Studio zeroStudio;
+    STUDIO_FILE.write(reinterpret_cast<const char*>(&zeroStudio), sizeof(Studio));
+    STUDIO_FILE.flush();
+
+    // Delete the corresponding Index record
+    Index index(studioId, studioAddress);
+    index.deleteRecord();
+
+    return !STUDIO_FILE.fail();
+}
+
+//bool Studio::deleteStudio() {
+//    if (!STUDIO_FILE)
+//        return false;
+//
+//    // Find the studio's address
+//    STUDIO_FILE.seekg(0, std::ios::beg);
+//    Studio studio;
+//    int64_t studioAddress = -1;
+//    while (STUDIO_FILE.read(reinterpret_cast<char*>(&studio), sizeof(Studio))) {
+//        if (studio.getStudioId() == studioId) {
+//            studioAddress = STUDIO_FILE.tellg() - static_cast<std::streamoff>(sizeof(Studio));
+//            break;
+//        }
+//    }
+//
+//    if (studioAddress == -1) {
+//        // Studio not found
+//        return false;
+//    }
+//
+//    // Mark the studio as deleted
+//    deletedStudiosAddresses.push_back(studioAddress / sizeof(Studio));
+//
+//    // Move to the studio's address and overwrite it with zeros
+//    STUDIO_FILE.seekp(studioAddress);
+//    Studio zeroStudio;
+//    STUDIO_FILE.write(reinterpret_cast<const char*>(&zeroStudio), sizeof(Studio));
+//    STUDIO_FILE.flush();
+//
+//    // Delete the corresponding Index record
+//    Index index(studioId, studioAddress);
+//    index.deleteRecord();
+//
+//    return !STUDIO_FILE.fail();
+//}
 
 uint32_t Studio::getStudioId() {
     return studioId;

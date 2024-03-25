@@ -19,7 +19,7 @@ int main() {
         FILM_FILE = getFile(film_filepath);
 
         while(true) {
-            std::cout << "Enter the command" << std::endl;
+            std::cout << "Enter the command:" << std::endl;
 
             std::string input;
             std::getline(std::cin, input);
@@ -49,7 +49,9 @@ int main() {
                 updateFilm(std::stoul(command.at(1)), std::stoul(command.at(2)), command.at(3).c_str(), command.at(4).c_str());
             }
             else if (command.at(0) == "del-m") {
-                delMaster(std::stoul(command.at(1)));
+                //delMaster(std::stoul(command.at(1)));
+                Studio st = getStudio(std::stoul(command.at(1)));
+                st.deleteStudio();
             }
             else if (command.at(0) == "del-s") {
                 delFilm(std::stoul(command.at(1)), std::stoul(command.at(2)));
