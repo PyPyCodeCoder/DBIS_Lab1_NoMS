@@ -18,5 +18,5 @@ std::fstream getFile(const std::string& filepath);
 std::vector<std::string> parseInput(std::string input);
 void getMaster(uint32_t id, std::string clarifier);
 void getSlave(uint32_t id, uint32_t studioId, std::string clarifier);
-bool updateStudio(uint32_t studioId, const char* newName);
+void updateFilm(uint32_t _id, uint32_t _studio_id, const char* _name, const char* _budget);
 #endif //LAB1_FUNCTIONS_H

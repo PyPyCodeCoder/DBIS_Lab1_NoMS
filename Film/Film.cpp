@@ -98,3 +98,61 @@ Film getFilm(uint32_t filmId, uint32_t studioId) {
 
     return Film(); // Return an empty Film object if the film is not found
 }
+
+bool Film::updateFilmName(const char* newName) {
+    if (!FILM_FILE)
+        return false;
+
+    // Find the film's address
+    FILM_FILE.seekg(0, std::ios::beg);
+    Film film;
+    int64_t filmAddress = -1;
+    while (FILM_FILE.read(reinterpret_cast<char*>(&film), sizeof(Film))) {
+        if (film.getFilmId() == filmId && film.getStudioId() == studioId) {
+            filmAddress = FILM_FILE.tellg() - static_cast<std::streamoff>(sizeof(Film));
+            break;
+        }
+    }
+
+    if (filmAddress == -1) {
+        // Film not found
+        return false;
+    }
+
+    // Update the film name
+    size_t nameOffset = offsetof(Film, filmName);
+    FILM_FILE.seekp(filmAddress + nameOffset);
+    FILM_FILE.write(newName, sizeof(filmName));
+    FILM_FILE.flush();
+
+    return !FILM_FILE.fail();
+}
+
+bool Film::updateFilmBudget(uint32_t newBudget) {
+    if (!FILM_FILE)
+        return false;
+
+    // Find the film's address
+    FILM_FILE.seekg(0, std::ios::beg);
+    Film film;
+    int64_t filmAddress = -1;
+    while (FILM_FILE.read(reinterpret_cast<char*>(&film), sizeof(Film))) {
+        if (film.getFilmId() == filmId && film.getStudioId() == studioId) {
+            filmAddress = FILM_FILE.tellg() - static_cast<std::streamoff>(sizeof(Film));
+            break;
+        }
+    }
+
+    if (filmAddress == -1) {
+        // Film not found
+        return false;
+    }
+
+    // Update the film budget
+    size_t budgetOffset = offsetof(Film, budget);
+    FILM_FILE.seekp(filmAddress + budgetOffset);
+    FILM_FILE.write(reinterpret_cast<const char*>(&newBudget), sizeof(newBudget));
+    FILM_FILE.flush();
+
+    return !FILM_FILE.fail();
+}

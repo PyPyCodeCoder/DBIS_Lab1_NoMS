@@ -72,7 +72,7 @@ _
 update-m 5 Sony_Pictures
 ```
 ```
-update-s 2 _ 160000000
+update-s 2 1 _ 160000000
 ```
 _
 ```

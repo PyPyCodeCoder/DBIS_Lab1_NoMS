@@ -37,6 +37,8 @@ public:
     void setNext(int64_t nextFilmAddress);
 
     bool insert();
+    bool updateFilmName(const char* newName);
+    bool updateFilmBudget(uint32_t newBudget);
 };
 
 Film getFilm(uint32_t filmId, uint32_t studioId);

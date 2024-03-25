@@ -70,6 +70,18 @@ void getSlave(uint32_t filmId, uint32_t studioId, std::string clarifier) {
     }
 }
 
+void updateFilm(uint32_t id, uint32_t studio_id, const char* name, const char* budget) {
+    Film film = getFilm(id, studio_id);
+
+    if (strcmp(name, "_") != 0) {
+        film.updateFilmName(name);
+    }
+
+    if (strcmp(budget, "_") != 0) {
+        film.updateFilmBudget(std::stoul(budget));
+    }
+}
+
 bool delFilm(uint32_t id, uint32_t studioId) {
     Film film = getFilm(id, studioId);
 

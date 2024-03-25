@@ -45,6 +45,9 @@ int main() {
                 Studio studio;
                 studio.updateStudioName(std::stoul(command.at(1)), command.at(2).c_str());
             }
+            else if (command.at(0) == "update-s") {
+                updateFilm(std::stoul(command.at(1)), std::stoul(command.at(2)), command.at(3).c_str(), command.at(4).c_str());
+            }
             else if (command.at(0) == "exit") {
                 return 0;
             }
