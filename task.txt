@@ -12,4 +12,4 @@ get-m for insert-s (in helpers.cpp)
 
 - хендлити однакові studioId під час вводу користувача
 
-ЗАРАЗ редагування get-s команди!!!!
+ЗАРАЗ UPDATE-S!!!
