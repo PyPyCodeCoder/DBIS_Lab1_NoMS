@@ -48,6 +48,9 @@ int main() {
             else if (command.at(0) == "update-s") {
                 updateFilm(std::stoul(command.at(1)), std::stoul(command.at(2)), command.at(3).c_str(), command.at(4).c_str());
             }
+            else if (command.at(0) == "del-s") {
+                delFilm(std::stoul(command.at(1)), std::stoul(command.at(2)));
+            }
             else if (command.at(0) == "exit") {
                 return 0;
             }

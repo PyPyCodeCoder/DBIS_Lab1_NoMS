@@ -82,10 +82,53 @@ void updateFilm(uint32_t id, uint32_t studio_id, const char* name, const char* b
     }
 }
 
-bool delFilm(uint32_t id, uint32_t studioId) {
-    Film film = getFilm(id, studioId);
+bool delFilm(uint32_t filmId, uint32_t studioId) {
+    if (!FILM_FILE)
+        return false;
 
-    /**/
+    // Get the master record from the master file
+    Studio studio = getStudio(studioId);
 
-    return false;
+    // Check if the studio exists
+    if (studio.getStudioId() == 0) {
+        return false; // Studio doesn't exist
+    }
+
+    // Get the address of the first film in the studio's list of films
+    int64_t firstStudiosFilmAddress = studio.getFirstStudiosFilmAddress();
+    int64_t prevFilmAddress = -1;
+    int64_t currentFilmAddress = firstStudiosFilmAddress;
+
+    // Search for the specific film in the list of films
+    Film currentFilm, lastFilm;
+    while (currentFilmAddress != -1) {
+        FILM_FILE.seekg(currentFilmAddress * sizeof(Film));
+        FILM_FILE.read(reinterpret_cast<char*>(&currentFilm), sizeof(Film));
+
+        if (currentFilm.getFilmId() == filmId && currentFilm.getStudioId() == studioId) {
+            // Film found, now delete it
+            if (prevFilmAddress != -1) {
+                // Not the first film in the list, so update previous film's next pointer
+                lastFilm.setNext(currentFilm.getNext());
+                FILM_FILE.seekp(prevFilmAddress * sizeof(Film));
+                FILM_FILE.write(reinterpret_cast<const char*>(&lastFilm), sizeof(Film));
+            } else {
+                // First film in the list, update studio's first film address
+                studio.updateStudiosFilmAddress(studioId, currentFilm.getNext());
+            }
+
+            // Remove the film from the file (mark it as deleted)
+            currentFilm = Film(); // Clear the current film data
+            FILM_FILE.seekp(currentFilmAddress * sizeof(Film));
+            FILM_FILE.write(reinterpret_cast<const char*>(&currentFilm), sizeof(Film));
+
+            return !FILM_FILE.fail();
+        }
+
+        prevFilmAddress = currentFilmAddress;
+        currentFilmAddress = currentFilm.getNext();
+        lastFilm = currentFilm; // Store the last film in case it's needed for updating next pointer
+    }
+
+    return false; // Film not found
 }
