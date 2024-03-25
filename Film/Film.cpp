@@ -156,3 +156,13 @@ bool Film::updateFilmBudget(uint32_t newBudget) {
 
     return !FILM_FILE.fail();
 }
+
+// Function to print all fields of a Film object (slave record)
+void printFilmDetails(const Film& film) {
+    std::cout << "Film ID: " << film.getFilmId() << std::endl;
+    std::cout << "Studio ID: " << film.getStudioId() << std::endl;
+    std::cout << "Film Name: " << film.getFilmName() << std::endl;
+    std::cout << "Budget: " << film.getBudget() << std::endl;
+    std::cout << "Next Film Address: " << film.getNext() << std::endl;
+    std::cout << std::endl;
+}

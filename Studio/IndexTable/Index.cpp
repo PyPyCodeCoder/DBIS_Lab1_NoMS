@@ -25,25 +25,61 @@ bool Index::insertRecord() {
     return !IND_FILE.fail();
 }
 
-bool Index::deleteRecord() {//сумнівно, але най буде
-    IND_FILE.seekg(0, std::ios::end);
-    int numRecords = IND_FILE.tellg() / sizeof(record);
+//bool Index::deleteRecord() {//сумнівно, але най буде
+//    IND_FILE.seekg(0, std::ios::end);
+//    int numRecords = IND_FILE.tellg() / sizeof(record);
+//    IND_FILE.seekg(0, std::ios::beg);
+//
+//    for (int i = 0; i < numRecords; ++i) {
+//        uint32_t currID;
+//        IND_FILE.read(reinterpret_cast<char*>(&currID), sizeof(currID));
+//        if (currID == record.first) {
+//            std::pair<uint32_t, uint32_t> emptyRecord = {0, 0};
+//            IND_FILE.seekp(i * sizeof(record));
+//            IND_FILE.write(reinterpret_cast<const char*>(&emptyRecord), sizeof(record));
+//            IND_FILE.flush();
+//
+//            return !IND_FILE.fail();
+//        }
+//        IND_FILE.seekg((i + 1) * sizeof(record));
+//    }
+//    return false;
+//}
+bool Index::deleteRecord() {
+    if (!IND_FILE)
+        return false;
+
     IND_FILE.seekg(0, std::ios::beg);
+    std::pair<uint32_t, uint32_t> currRecord;
+    int64_t currRecordAddress = -1;
+    int64_t prevRecordAddress = -1;
 
-    for (int i = 0; i < numRecords; ++i) {
-        uint32_t currID;
-        IND_FILE.read(reinterpret_cast<char*>(&currID), sizeof(currID));
-        if (currID == record.first) {
+    while (IND_FILE.read(reinterpret_cast<char*>(&currRecord), sizeof(currRecord))) {
+        if (currRecord == record) {
+            // Record found, now delete it
+            if (prevRecordAddress != -1) {
+                // Not the first record, update previous record's next pointer
+                IND_FILE.seekp(prevRecordAddress * sizeof(record));
+                IND_FILE.write(reinterpret_cast<const char*>(&currRecordAddress), sizeof(currRecordAddress));
+            } else {
+                // First record, update the deletedAddresses vector
+                deletedAddresses.push_back(0);
+            }
+
+            // Remove the record from the file (mark it as deleted)
+            IND_FILE.seekp(currRecordAddress * sizeof(record));
             std::pair<uint32_t, uint32_t> emptyRecord = {0, 0};
-            IND_FILE.seekp(i * sizeof(record));
             IND_FILE.write(reinterpret_cast<const char*>(&emptyRecord), sizeof(record));
-            IND_FILE.flush();
 
+            IND_FILE.flush();
             return !IND_FILE.fail();
         }
-        IND_FILE.seekg((i + 1) * sizeof(record));
+
+        prevRecordAddress = currRecordAddress;
+        currRecordAddress = IND_FILE.tellg() / sizeof(record);
     }
-    return false;
+
+    return false; // Record not found
 }
 
 std::pair<uint32_t, uint32_t> Index::getRecordAt(uint32_t index) {

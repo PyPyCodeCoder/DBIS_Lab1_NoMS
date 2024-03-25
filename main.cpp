@@ -48,8 +48,28 @@ int main() {
             else if (command.at(0) == "update-s") {
                 updateFilm(std::stoul(command.at(1)), std::stoul(command.at(2)), command.at(3).c_str(), command.at(4).c_str());
             }
+            else if (command.at(0) == "del-m") {
+                delMaster(std::stoul(command.at(1)));
+            }
             else if (command.at(0) == "del-s") {
                 delFilm(std::stoul(command.at(1)), std::stoul(command.at(2)));
+            }
+            else if (command.at(0) == "calc-m") {
+                std::cout << "Number of master records: " << countMasterRecords() << std::endl;
+            }
+            else if (command.at(0) == "calc-s") {
+                if(command.size() == 1) {
+                    std::cout << "Number of slave records: " << countSlaveRecords() << std::endl;
+                }
+                else {
+                    std::cout << "Number of films for studio ID " << std::stoul(command.at(1)) << ": " << countSlaveRecordsForMaster(std::stoul(command.at(1))) << std::endl;
+                }
+            }
+            else if (command.at(0) == "ut-m") {
+                printAllMasterRecords();
+            }
+            else if (command.at(0) == "ut-s") {
+                printAllSlaveRecords();
             }
             else if (command.at(0) == "exit") {
                 return 0;

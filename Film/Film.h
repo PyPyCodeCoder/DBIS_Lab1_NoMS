@@ -42,5 +42,6 @@ public:
 };
 
 Film getFilm(uint32_t filmId, uint32_t studioId);
+void printFilmDetails(const Film& film);
 
 #endif //LAB1_FILM_H

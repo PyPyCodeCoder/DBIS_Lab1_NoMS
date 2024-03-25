@@ -111,3 +111,12 @@ Studio getStudio(uint32_t studioID) {
     STUDIO_FILE.read(reinterpret_cast<char*>(&studio), sizeof(Studio));
     return studio;
 }
+
+// Function to print all fields of a Studio object (master record)
+void printStudioDetails(Studio& studio) {
+    std::cout << "Studio ID: " << studio.getStudioId() << std::endl;
+    std::cout << "Studio Name: " << studio.getStudioName() << std::endl;
+    std::cout << "First Studio's Film Address: " << studio.getFirstStudiosFilmAddress() << std::endl;
+    std::cout << "Studio Address: " << studio.getStudioAddress() << std::endl;
+    std::cout << std::endl;
+}

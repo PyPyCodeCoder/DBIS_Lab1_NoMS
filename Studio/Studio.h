@@ -47,5 +47,6 @@ public:
 };
 
 Studio getStudio(uint32_t studioId);
+void printStudioDetails(Studio& studio);
 
 #endif //LAB1_STUDIO_H

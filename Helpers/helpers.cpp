@@ -132,3 +132,218 @@ bool delFilm(uint32_t filmId, uint32_t studioId) {
 
     return false; // Film not found
 }
+
+//void delMaster(uint32_t studioId) {
+//    // Get the studio by its ID
+//    Studio studio = getStudio(studioId);
+//
+//    // If the studio is not found, exit the function
+//    if (studio.getStudioId() == 0) {
+//        std::cout << "Studio with ID " << studioId << " not found." << std::endl;
+//        return;
+//    }
+//
+//    // Delete all films associated with this studio
+//    int64_t currentFilmAddress = studio.getFirstStudiosFilmAddress();
+//    while (currentFilmAddress != -1) {
+//        Film currentFilm;
+//        FILM_FILE.seekg(currentFilmAddress * sizeof(Film));
+//        FILM_FILE.read(reinterpret_cast<char*>(&currentFilm), sizeof(Film));
+//
+//        int64_t nextFilmAddress = currentFilm.getNext();
+//        delFilm(currentFilm.getFilmId(), studioId);
+//        currentFilmAddress = nextFilmAddress;
+//    }
+//
+//    // Delete the studio from the index file
+//    Index index(studioId, studio.getStudioAddress());
+//    index.deleteRecord();
+//
+//    // Move the last record in the studio file to the position of the deleted studio
+//    STUDIO_FILE.seekg(0, std::ios::end);
+//    int64_t lastStudioAddress = (STUDIO_FILE.tellg() / sizeof(Studio)) - 1;
+//    if (lastStudioAddress >= 0) {
+//        Studio lastStudio;
+//        STUDIO_FILE.seekg(lastStudioAddress * sizeof(Studio));
+//        STUDIO_FILE.read(reinterpret_cast<char*>(&lastStudio), sizeof(Studio));
+//
+//        // Update the last studio's record in the index file
+//        Index lastIndex(lastStudio.getStudioId(), studio.getStudioAddress());
+//        lastIndex.deleteRecord();
+//        lastIndex.insertRecord();
+//
+//        // Move the last record to the position of the deleted studio
+//        STUDIO_FILE.seekp(studio.getStudioAddress() * sizeof(Studio));
+//        STUDIO_FILE.write(reinterpret_cast<const char*>(&lastStudio), sizeof(Studio));
+//    }
+//
+//    // Delete the last record in the studio file
+//    STUDIO_FILE.seekp(0, std::ios::end);
+//    STUDIO_FILE.seekp(std::max(static_cast<int64_t>(0), static_cast<int64_t>(STUDIO_FILE.tellp()) - static_cast<int64_t>(sizeof(Studio))));
+//    Studio emptyStudio;
+//    STUDIO_FILE.write(reinterpret_cast<const char*>(&emptyStudio), sizeof(Studio));
+//
+//    // Sort the index file
+//    Index ind(0, 0);
+//    ind.sortRecords();
+//}
+
+void delMaster(uint32_t studioId) {
+    // Get the studio by its ID
+    Studio studio = getStudio(studioId);
+
+    // If the studio is not found, exit the function
+    if (studio.getStudioId() == 0) {
+        std::cout << "Studio with ID " << studioId << " not found." << std::endl;
+        return;
+    }
+
+    // Delete all films associated with this studio
+    int64_t currentFilmAddress = studio.getFirstStudiosFilmAddress();
+    while (currentFilmAddress != -1) {
+        Film currentFilm;
+        FILM_FILE.seekg(currentFilmAddress * sizeof(Film));
+        FILM_FILE.read(reinterpret_cast<char*>(&currentFilm), sizeof(Film));
+
+        int64_t nextFilmAddress = currentFilm.getNext();
+        delFilm(currentFilm.getFilmId(), studioId);
+        currentFilmAddress = nextFilmAddress;
+    }
+
+    // Delete the studio from the index file
+    IND_FILE.seekg(0, std::ios::beg);
+    std::pair<uint32_t, uint32_t> currRecord;
+    int64_t currRecordAddress = -1;
+    int64_t prevRecordAddress = -1;
+
+    while (IND_FILE.read(reinterpret_cast<char*>(&currRecord), sizeof(currRecord))) {
+        if (currRecord.first == studioId) {
+            // Record found, now delete it
+            if (prevRecordAddress != -1) {
+                // Not the first record, update previous record's next pointer
+                IND_FILE.seekp(prevRecordAddress * sizeof(currRecord));
+                IND_FILE.write(reinterpret_cast<const char*>(&currRecordAddress), sizeof(currRecordAddress));
+            } else {
+                // First record, update the deletedAddresses vector
+                Index::updateDeletedAddresses(0);
+            }
+
+            // Remove the record from the file (mark it as deleted)
+            IND_FILE.seekp(currRecordAddress * sizeof(currRecord));
+            std::pair<uint32_t, uint32_t> emptyRecord = {0, 0};
+            IND_FILE.write(reinterpret_cast<const char*>(&emptyRecord), sizeof(currRecord));
+
+            IND_FILE.flush();
+            break;
+        }
+
+        prevRecordAddress = currRecordAddress;
+        currRecordAddress = IND_FILE.tellg() / sizeof(currRecord);
+    }
+
+    // Move the last record in the studio file to the position of the deleted studio
+    STUDIO_FILE.seekg(0, std::ios::end);
+    int64_t lastStudioAddress = (STUDIO_FILE.tellg() / sizeof(Studio)) - 1;
+    if (lastStudioAddress >= 0) {
+        Studio lastStudio;
+        STUDIO_FILE.seekg(lastStudioAddress * sizeof(Studio));
+        STUDIO_FILE.read(reinterpret_cast<char*>(&lastStudio), sizeof(Studio));
+
+        // Update the last studio's record in the index file
+        IND_FILE.seekg(0, std::ios::beg);
+        std::pair<uint32_t, uint32_t> lastRecord;
+        int64_t lastRecordAddress = -1;
+        while (IND_FILE.read(reinterpret_cast<char*>(&lastRecord), sizeof(lastRecord))) {
+            if (lastRecord.first == lastStudio.getStudioId()) {
+                lastRecordAddress = IND_FILE.tellg() - static_cast<std::streamoff>(sizeof(lastRecord));
+                break;
+            }
+        }
+
+        if (lastRecordAddress != -1) {
+            IND_FILE.seekp(lastRecordAddress);
+            std::pair<uint32_t, uint32_t> newRecord(lastStudio.getStudioId(), studio.getStudioAddress());
+            IND_FILE.write(reinterpret_cast<const char*>(&newRecord), sizeof(newRecord));
+        }
+
+        // Move the last record to the position of the deleted studio
+        STUDIO_FILE.seekp(studio.getStudioAddress() * sizeof(Studio));
+        STUDIO_FILE.write(reinterpret_cast<const char*>(&lastStudio), sizeof(Studio));
+    }
+
+    // Delete the last record in the studio file
+    STUDIO_FILE.seekp(0, std::ios::end);
+    STUDIO_FILE.seekp(std::max(static_cast<int64_t>(0), static_cast<int64_t>(STUDIO_FILE.tellp()) - static_cast<int64_t>(sizeof(Studio))));
+    Studio emptyStudio;
+    STUDIO_FILE.write(reinterpret_cast<const char*>(&emptyStudio), sizeof(Studio));
+
+    // Sort the index file
+    Index ind(0, 0);
+    ind.sortRecords();
+}
+
+// Function to count the total number of master records
+uint32_t countMasterRecords() {
+    IND_FILE.seekg(0, std::ios::end);
+    uint32_t numMasterRecords = IND_FILE.tellg() / sizeof(std::pair<uint32_t, uint32_t>);
+    return numMasterRecords;
+}
+
+// Function to count the total number of slave records
+uint32_t countSlaveRecords() {
+    FILM_FILE.seekg(0, std::ios::end);
+    uint32_t numSlaveRecords = FILM_FILE.tellg() / sizeof(Film);
+    return numSlaveRecords;
+}
+
+// Function to count the number of slave records for a given master record
+uint32_t countSlaveRecordsForMaster(uint32_t studioId) {
+    Studio studio = getStudio(studioId);
+
+    if (studio.getStudioId() == 0) {
+        // Studio not found
+        return 0;
+    }
+
+    int64_t firstStudiosFilmAddress = studio.getFirstStudiosFilmAddress();
+    uint32_t slaveRecordCount = 0;
+
+    FILM_FILE.seekg(firstStudiosFilmAddress * sizeof(Film));
+    Film film;
+    while (FILM_FILE.read(reinterpret_cast<char*>(&film), sizeof(Film))) {
+        if (film.getStudioId() == studioId) {
+            slaveRecordCount++;
+        }
+        int64_t nextFilmAddress = film.getNext();
+        if (nextFilmAddress == -1) {
+            break;
+        }
+        FILM_FILE.seekg(nextFilmAddress * sizeof(Film));
+    }
+
+    return slaveRecordCount;
+}
+
+// Function to print all master records (studios)
+void printAllMasterRecords() {
+    IND_FILE.seekg(0, std::ios::beg);
+    std::pair<uint32_t, uint32_t> recordPair;
+    while (IND_FILE.read(reinterpret_cast<char*>(&recordPair), sizeof(recordPair))) {
+        if (recordPair.first != 0) {
+            uint32_t studioId = recordPair.first;
+            Studio studio = getStudio(studioId);
+            printStudioDetails(studio);
+        }
+    }
+}
+
+// Function to print all slave records (films)
+void printAllSlaveRecords() {
+    FILM_FILE.seekg(0, std::ios::beg);
+    Film film;
+    while (FILM_FILE.read(reinterpret_cast<char*>(&film), sizeof(Film))) {
+        if (film.getFilmId() != 0) {
+            printFilmDetails(film);
+        }
+    }
+}
