@@ -20,7 +20,6 @@ void getMaster(uint32_t id, std::string clarifier);
 void getSlave(uint32_t id, uint32_t studioId, std::string clarifier);
 void updateFilm(uint32_t _id, uint32_t _studio_id, const char* _name, const char* _budget);
 bool delFilm(uint32_t filmId, uint32_t studioId);
-//void delMaster(uint32_t studioId);
 uint32_t countMasterRecords();
 uint32_t countSlaveRecords();
 uint32_t countSlaveRecordsForMaster(uint32_t studioId);

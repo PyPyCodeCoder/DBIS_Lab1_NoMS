@@ -22,7 +22,7 @@ public:
 
     Film(uint32_t _id, uint32_t _studio_id, const char* _name, uint32_t _budget) : filmId(_id), studioId(_studio_id), budget(_budget), next(-1) {
         strncpy(filmName, _name, sizeof(filmName) - 1);
-        filmName[sizeof(filmName) - 1] = '\0'; // Ensure null-termination
+        filmName[sizeof(filmName) - 1] = '\0';
     }
 
     uint32_t getFilmId() const;

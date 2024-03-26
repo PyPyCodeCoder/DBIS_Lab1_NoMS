@@ -69,41 +69,10 @@ bool Film::insert() {
     return !FILM_FILE.fail() && !STUDIO_FILE.fail();
 }
 
-Film getFilm(uint32_t filmId, uint32_t studioId) {
-    // Get the master record from the master file
-    Studio studio = getStudio(studioId);
-
-    // Check if the studio exists
-    if (studio.getStudioId() == 0) {
-        return Film(); // Return an empty Film object if the studio doesn't exist
-    }
-
-    // Get the address of the first film in the studio's list of films
-    int64_t firstStudiosFilmAddress = studio.getFirstStudiosFilmAddress();
-
-    // Search for the specific film in the list of films
-    Film film;
-    FILM_FILE.seekg(firstStudiosFilmAddress * sizeof(Film)); // Move to the beginning of the films list
-    while (FILM_FILE.read(reinterpret_cast<char*>(&film), sizeof(Film))) {
-        if (film.getFilmId() == filmId) { // Check if the film ID matches
-            return film; // Return the found film
-        }
-        // Move to the next film using the next pointer
-        if (film.getNext() != -1) {
-            FILM_FILE.seekg(film.getNext() * sizeof(Film));
-        } else {
-            break; // If next pointer is -1, it means we've reached the end of the list
-        }
-    }
-
-    return Film(); // Return an empty Film object if the film is not found
-}
-
 bool Film::updateFilmName(const char* newName) {
     if (!FILM_FILE)
         return false;
 
-    // Find the film's address
     FILM_FILE.seekg(0, std::ios::beg);
     Film film;
     int64_t filmAddress = -1;
@@ -115,11 +84,9 @@ bool Film::updateFilmName(const char* newName) {
     }
 
     if (filmAddress == -1) {
-        // Film not found
         return false;
     }
 
-    // Update the film name
     size_t nameOffset = offsetof(Film, filmName);
     FILM_FILE.seekp(filmAddress + nameOffset);
     FILM_FILE.write(newName, sizeof(filmName));
@@ -132,7 +99,6 @@ bool Film::updateFilmBudget(uint32_t newBudget) {
     if (!FILM_FILE)
         return false;
 
-    // Find the film's address
     FILM_FILE.seekg(0, std::ios::beg);
     Film film;
     int64_t filmAddress = -1;
@@ -144,11 +110,9 @@ bool Film::updateFilmBudget(uint32_t newBudget) {
     }
 
     if (filmAddress == -1) {
-        // Film not found
         return false;
     }
 
-    // Update the film budget
     size_t budgetOffset = offsetof(Film, budget);
     FILM_FILE.seekp(filmAddress + budgetOffset);
     FILM_FILE.write(reinterpret_cast<const char*>(&newBudget), sizeof(newBudget));
@@ -157,7 +121,31 @@ bool Film::updateFilmBudget(uint32_t newBudget) {
     return !FILM_FILE.fail();
 }
 
-// Function to print all fields of a Film object (slave record)
+Film getFilm(uint32_t filmId, uint32_t studioId) {
+    Studio studio = getStudio(studioId);
+
+    if (studio.getStudioId() == 0) {
+        return Film();
+    }
+
+    int64_t firstStudiosFilmAddress = studio.getFirstStudiosFilmAddress();
+
+    Film film;
+    FILM_FILE.seekg(firstStudiosFilmAddress * sizeof(Film));
+    while (FILM_FILE.read(reinterpret_cast<char*>(&film), sizeof(Film))) {
+        if (film.getFilmId() == filmId) {
+            return film;
+        }
+        if (film.getNext() != -1) {
+            FILM_FILE.seekg(film.getNext() * sizeof(Film));
+        } else {
+            break;
+        }
+    }
+
+    return Film();
+}
+
 void printFilmDetails(const Film& film) {
     std::cout << "Film ID: " << film.getFilmId() << std::endl;
     std::cout << "Studio ID: " << film.getStudioId() << std::endl;

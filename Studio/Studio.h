@@ -17,7 +17,6 @@ private:
     int64_t firstStudiosFilmAddress;
 
     int64_t studioAddress;//адреса студії (може змінюватись)
-    //static std::vector<int64_t> deletedStudiosAddresses;
     static std::vector<uint32_t> deletedStudiosAddresses;
 
 public:
@@ -33,10 +32,8 @@ public:
     uint32_t getStudioId();
 
     const char* getStudioName();
-    void setStudioName(const char* newName);
 
     int64_t getFirstStudiosFilmAddress();
-    void setFirstStudiosFilmAddress(int64_t newAddress);
 
     int64_t getStudioAddress();
 
